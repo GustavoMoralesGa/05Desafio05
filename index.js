@@ -1,29 +1,25 @@
-const express = require('express');
-const { getJewels, HATEOAS, getFilterJewels } = require('./consultas');
+import express from 'express';
+import apiJoyas from './src/apiJoyas.js';
+import { logger } from './src/middleware.js';
+
 const app = express();
 const port = 3000;
 
-app.listen(port, console.log(`Servidor iniciado en puerto ${port}`))
+app.use(logger)
 
-app.get('/joyas', async (req, res) => {
-  try {
-  const queryStrings = req.query
-  const joyas = await getJewels(queryStrings)
-  const getHATEOAS = await HATEOAS(joyas)
-  res.json(getHATEOAS);
-  } catch (err) {
-    res.status(500).send(err)
-  }
+app.use('/joyas', apiJoyas);
+
+app.use((err, _req, res, _next) => {
+  console.log('Error In App', err);
+  const errorResponse = {
+    err,
+    msg: 'Oops, application failed'
+  };
+  res.status(500).send(errorResponse)
 })
 
-// FALTA MANEJAR MIDLEWARE Y TRY CATCH
-
-app.get('/joyas/filtros', async (req, res) => {
-  const queryStrings = req.query
-  const joyas = await getFilterJewels(queryStrings)
-  res.json(joyas)
-})  
-
-app.get('*', (req, res) => {
+app.get('*', (_req, res) => {
   res.status(404).send("Lo siento, esta ruta no existe (ni en otro multiverso)")
 })
+
+app.listen(port, console.log(`Servidor iniciado en puerto ${port}`))

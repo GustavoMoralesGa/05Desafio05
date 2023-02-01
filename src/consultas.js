@@ -1,5 +1,7 @@
-const { Pool } = require('pg')
-const format = require('pg-format')
+import pg from 'pg';
+import format from 'pg-format';
+
+const { Pool } = pg;
 
 const pool = new Pool({
   user: "postgres",
@@ -45,7 +47,7 @@ const getFilterJewels = async ({precio_max, precio_min, categoria, metal}) => {
 }
 
 
-const HATEOAS = (inventario) => {
+const hateoas = (inventario) => {
   const results = inventario.map((m) => {
     return {
       name: m.nombre,
@@ -53,12 +55,16 @@ const HATEOAS = (inventario) => {
     }
   }).slice(0, 6)
   const total = inventario.length
-  const HATEOAS = {
+  const result = {
     total,
     results
   }
-  return HATEOAS
+  return result
 }
 
 
-module.exports = {getJewels, getFilterJewels, HATEOAS}
+export {
+  getJewels,
+  getFilterJewels,
+  hateoas,
+}
